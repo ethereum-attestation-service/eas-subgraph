@@ -13,6 +13,7 @@ export function handleRegisteredAS(event: Registered): void {
   entity.schemaData = schema.schema;
   entity.schema = schema.schema.toString();
   entity.resolver = schema.resolver.toHexString();
+  entity.txid = event.transaction.hash;
   entity.creator = event.params.attester.toHexString();
   entity.index = schema.index;
   entity.save()
@@ -37,6 +38,7 @@ export function handleAttested(event: Attested): void {
   entity.expirationTime = att.expirationTime
   entity.revocationTime = att.revocationTime
   entity.refUUID = att.refUUID
+  entity.txid = event.transaction.hash;
   entity.revoked = false
   entity.save();
 

@@ -9,6 +9,7 @@ type Attestation @entity {
   revocationTime: BigInt!
   refUUID: Bytes!
   revoked: Boolean!
+  txid: Bytes!
 }
 
 type ASSchema @entity {
@@ -17,5 +18,6 @@ type ASSchema @entity {
   schema: String!
   creator: String! # address
   resolver: String!
-  index: BigInt!,
+  index: BigInt!
+  txid: Bytes!
 }
