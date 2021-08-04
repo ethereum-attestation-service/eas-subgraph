@@ -1,6 +1,12 @@
-type ExampleEntity @entity {
+type Attestation @entity {
   id: ID!
-  count: BigInt!
+  data: Bytes!
+  schema: Bytes!
   recipient: Bytes! # address
   attester: Bytes! # address
+  time: BigInt!
+  expirationTime: BigInt!
+  revocationTime: BigInt!
+  refUUID: Bytes!
+  revoked: Boolean!
 }

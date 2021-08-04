@@ -1,23 +1,24 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Contract
+    name: EAS
     network: rinkeby
     source:
       address: "0xBf49E19254DF70328C6696135958C94CD6cd0430"
-      abi: Contract
+      abi: EAS
+      startBlock: 9034913
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.2
+      apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
         - Attested
         - Revoked
       abis:
-        - name: Contract
-          file: ./abis/Contract.json
+        - name: EAS
+          file: ./abis/EAS.json
       eventHandlers:
         - event: Attested(indexed address,indexed address,bytes32,indexed bytes32)
           handler: handleAttested

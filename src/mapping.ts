@@ -1,46 +1,29 @@
-import { BigInt } from "@graphprotocol/graph-ts"
-import { Contract, Attested, Revoked } from "../generated/Contract/Contract"
-import { ExampleEntity } from "../generated/schema"
+import { BigInt, log } from "@graphprotocol/graph-ts"
+import { EAS, Attested, Revoked } from "../generated/EAS/EAS"
+import { Attestation } from "../generated/schema"
 
 export function handleAttested(event: Attested): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+  let entity = Attestation.load(event.params.uuid.toHex())
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
   if (entity == null) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+    entity = new Attestation(event.params.uuid.toHex())
   }
 
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
   entity.recipient = event.params.recipient
   entity.attester = event.params.attester
+  entity.schema = event.params.schema
 
-  // Entities can be written to the store with `.save()`
-  entity.save()
+  let easContract = EAS.bind(event.address)
+  let att = easContract.getAttestation(event.params.uuid)
 
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
+  entity.data = att.data
+  entity.time = att.time
+  entity.expirationTime = att.expirationTime
+  entity.revocationTime = att.revocationTime
+  entity.refUUID = att.refUUID
+  entity.revoked = false
+  entity.save();
 
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
   // - contract.VERSION(...)
   // - contract.getASRegistry(...)
   // - contract.getAttestation(...)
@@ -57,4 +40,8 @@ export function handleAttested(event: Attested): void {
   // - contract.isAttestationValid(...)
 }
 
-export function handleRevoked(event: Revoked): void {}
+export function handleRevoked(event: Revoked): void {
+  let entity = Attestation.load(event.params.uuid.toHex())
+  entity.revoked = true
+  entity.save()
+}
