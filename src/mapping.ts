@@ -1,6 +1,22 @@
-import { BigInt, log } from "@graphprotocol/graph-ts"
+import { BigInt, log, Address } from "@graphprotocol/graph-ts"
 import { EAS, Attested, Revoked } from "../generated/EAS/EAS"
-import { Attestation } from "../generated/schema"
+import { ASRegistry, Registered } from "../generated/ASRegistry/ASRegistry"
+import { Attestation, ASSchema } from "../generated/schema"
+
+
+
+export function handleRegisteredAS(event: Registered): void {
+  let entity = new ASSchema(event.params.uuid.toHex())
+  let schemaContract = ASRegistry.bind(event.address)
+
+  let schema = schemaContract.getAS(event.params.uuid);
+  entity.schemaData = schema.schema;
+  entity.schema = schema.schema.toString();
+  entity.resolver = schema.resolver.toHexString();
+  entity.creator = event.params.attester.toHexString();
+  entity.index = schema.index;
+  entity.save()
+}
 
 export function handleAttested(event: Attested): void {
   let entity = Attestation.load(event.params.uuid.toHex())
@@ -11,7 +27,7 @@ export function handleAttested(event: Attested): void {
 
   entity.recipient = event.params.recipient
   entity.attester = event.params.attester
-  entity.schema = event.params.schema
+  entity.schema = event.params.schema.toHexString()
 
   let easContract = EAS.bind(event.address)
   let att = easContract.getAttestation(event.params.uuid)

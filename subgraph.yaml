@@ -25,3 +25,23 @@ dataSources:
         - event: Revoked(indexed address,indexed address,bytes32,indexed bytes32)
           handler: handleRevoked
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: ASRegistry
+    network: rinkeby
+    source:
+      address: "0xd8b7ec70d53b11e130fba78fbed97862ef2a13f0"
+      abi: ASRegistry
+      startBlock: 9034913
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Registered
+      abis:
+        - name: ASRegistry
+          file: ./abis/ASRegistryAbi.json
+      eventHandlers:
+        - event: Registered(indexed bytes32,indexed uint256,bytes,address,address)
+          handler: handleRegisteredAS
+      file: ./src/mapping.ts
